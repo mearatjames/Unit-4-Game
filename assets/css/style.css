@@ -1,0 +1,9 @@
+body, p {
+    font-family: 'Press Start 2P', cursive !important;
+}
+
+.banner  {
+    margin: 0 auto;
+    width: 20%;
+    height: 50%;
+}
