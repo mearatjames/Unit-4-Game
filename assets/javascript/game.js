@@ -1,16 +1,14 @@
 //DOM Selectors
 let _message = $('#message')
-let _attacker = $('#attacker')
-let _defender = $('#defender')
 let _attackHp = $('#attackHp')
-let _attackHpBar = $('#attachHpBar')
+let _attackHpBar = $('#attackHpBar')
 let _defendHp = $('#defendHp')
 let _defendHpBar = $('#defendHpBar')
 let _attackPwr = $('#attackPwr')
-let _attackPwrBar = $('#attackPwrBar')
 let _counterPwr = $('#counterPwr')
-let _counterPwrBar = $('#counterPwrBar')
 let _attackBtn = $('#attackBtn')
+let _fightArea = $('#fightArea').clone()
+let _characters = $('#characters').clone()
 
 
 //Global Variables
@@ -23,19 +21,19 @@ let character = [
     },
     goomba = {
          name: 'goomba',
-         hp: 90,
+         hp: 110,
          atk: 10,
          catk: 5,
     },
     koopa = {
          name: 'koopa',
          hp: 130,
-         atk: 7,
+         atk: 8,
          catk: 7,
     },
     bowser = {
          name: 'bowser',
-         hp: 130,
+         hp: 140,
          atk: 11,
          catk: 8,
     }
@@ -45,15 +43,13 @@ let hasAttacker = false;
 let hasDefender = false;
 let attackReady = false;
 let selectedAttacker, selectedDefender;
+let attackerStats, defenderStats;
 
     
     //Game Function
     
     function startGame() {
-        hasAttacker = false;
-        hasDefender = false;
-        attackReady = false;
-        
+        reset();
         _message.text('Select the attacker');
         selectAttacker();
     }
@@ -63,57 +59,90 @@ let selectedAttacker, selectedDefender;
         $('.character').on('click', function() {
             if (!hasAttacker) {
                 selectedAttacker = $(this);
-                // console.log(selectedAttacker.attr('id'))
                 hasAttacker = true;
                 _message.text('Select the defender');
                 $('#atkArea').replaceWith(selectedAttacker);
-                attackerStats();
+                let name = $('#attacker');
+                let hp = $('#attackHp');
+                let pwr = $('#attackPwr')
+                let bar = $('#attackHpBar');
+                stats(selectedAttacker, name, hp, bar, pwr);
+                attackerStats = charStats(selectedAttacker)
             } else {
                 selectedDefender = $(this);
-                selectDefender(selectedDefender);
-                defenderStats();
+                hasDefender = true;
+                $('#defendArea').replaceWith(selectedDefender);
+                _message.text('Click Attack! Button');
+                attackReady = true;
+                let name = $('#defender');
+                let hp = $('#defendHp');
+                let pwr = $('#counterPwr')
+                let bar = $('#defendHpBar');
+                stats(selectedDefender, name, hp, bar, pwr);
+                defenderStats = charStats(selectedDefender)
             }
         })
     }
-    
-    //Attacker Stats  
-    function attackerStats(){
+    //Character Stats
+    function charStats(char) {
         for (let i = 0; i < character.length; i++) {
-            if (selectedAttacker.attr('id') === character[i].name)
-            console.log(character[i].name);
-            _attackHp.text(character[i].hp);
-            _attackPwr.text(character[i].atk);
+            if (char.attr('id') === character[i].name){
+                console.log(character[i])
+                return character[i];
+            }
         }
-    } 
-
-    //Select Defender
-    function selectDefender(selectedDefender) {
-        hasDefender = true;
-        $('#defendArea').replaceWith(selectedDefender);
-        _message.text('Click Attack! Button');
-        attackReady = true;
     }
 
-    //Defender Stats
-    function defenderStats(){
+    //Attacker Stats  
+    function stats(a, b, c, d, e){
         for (let i = 0; i < character.length; i++) {
-        if (selectedDefender.attr('id') === character[i].name)
-            console.log(character[i].name);
-            _defendHp.text(character[i].hp);
-            _counterPwr.text(character[i].catk);
+            if (a.attr('id') === character[i].name){
+            c.text(character[i].hp);
+            b.text(character[i].name.toUpperCase());
+            hpBar = Math.floor((character[i].hp / 150) * 100);
+            d.attr("style","width: " + hpBar + "%");
+            !attackReady ? e.text(character[i].atk): e.text(character[i].catk)
+            }
         }
     } 
     
     //Attack Function
     function attack() { 
         if (attackReady) {
-            console.log('Attack!')
+            defenderStats.hp = defenderStats.hp - attackerStats.atk;
+            attackReady = false;
+            statsUpdate(defenderStats.hp)
+            setTimeout(function(){
+               attackerStats.hp = attackerStats.hp - defenderStats.catk;
+               attackerStats.atk = attackerStats.atk * 2;
+               statsUpate2 (attackerStats.hp, attackerStats.atk)
+               attackReady = true;
+            }, 1000)
         }
+    }
+
+    function statsUpdate(defendHealth) {
+        $('#defendHp').text(defendHealth);
+        $('#defendHpBar').attr("style", "width: " + Math.floor((defendHealth / 150) * 100 )+ "%")
+    }
+
+    function statsUpate2(attackHealth, pwrUp) {
+        $('#attackHp').text(attackHealth);
+        $('#attackHpBar').attr("style", "width: " + Math.floor((attackHealth / 150) * 100 )+ "%")
+        $('#attackPwr').text(pwrUp);
     }
     
     //Game Reset
     function reset() {
-        
+        hasAttacker = false;
+        hasDefender = false;
+        attackReady = false;
+        _attackHp.empty();
+        _attackPwr.empty();
+        _defendHp.empty();
+        _counterPwr.empty();
+        $('#fightArea').replaceWith(_fightArea.clone())
+        $('#characters').replaceWith(_characters.clone())
         }
         
         //Eventlistener
