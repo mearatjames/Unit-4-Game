@@ -12,4 +12,5 @@ body, p {
     margin: 0 auto;
     width: 100px;
     height: 150px;
+    position: relative;
 }

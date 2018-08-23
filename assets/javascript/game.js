@@ -179,9 +179,16 @@ function selectAttacker() {
          } else { 
             winAudio.play();
             _message.text("You defeated all defenders!!");
-
+            selectedAttacker.animate({
+                left: '120%',
+                height: '200px',
+                width: '180px'
+            });
+            $('#defend').animate({opacity: 0})
+            $('#attacker').animate({opacity: 0})
+            $('.stats').animate({opacity: 0})
+            }
         }
-    }
     }
     
     //Game Reset
@@ -197,6 +204,9 @@ function selectAttacker() {
         $('.progress').children().attr("style", "width: 0%");
         $('#fightArea').replaceWith(_fightArea.clone())
         $('#characters').replaceWith(_characters.clone())
+        $('#defend').animate({opacity: 1})
+        $('#attacker').animate({opacity: 1})
+        $('.stats').animate({opacity: 1})
         _message.text("Select the attacker")
         character = [
             mario = {
@@ -224,8 +234,7 @@ function selectAttacker() {
                  catk: 13,
             }
         ]
-        }
-        
+    }   
         //Eventlistener
      _attackBtn.on('click', attack)
     $('#startGame').on('click', startGame)
