@@ -9,33 +9,33 @@ let _counterPwr = $('#counterPwr')
 let _attackBtn = $('#attackBtn')
 let _fightArea = $('#fightArea').clone()
 let _characters = $('#characters').clone()
-
+let _defend = $('#defend').clone()
 
 //Global Variables
 let character = [
     mario = {
          name: 'mario',
          hp: 120,
-         atk: 9,
-         catk: 6,
+         atk: 7,
+         catk: 8,
     },
     goomba = {
          name: 'goomba',
-         hp: 110,
-         atk: 10,
-         catk: 5,
+         hp: 100,
+         atk: 6,
+         catk: 6,
     },
     koopa = {
          name: 'koopa',
-         hp: 130,
-         atk: 8,
-         catk: 7,
+         hp: 110,
+         atk: 7,
+         catk: 10,
     },
     bowser = {
          name: 'bowser',
-         hp: 140,
-         atk: 11,
-         catk: 8,
+         hp: 130,
+         atk: 7,
+         catk: 12,
     }
 ]
 
@@ -44,7 +44,7 @@ let hasDefender = false;
 let attackReady = false;
 let selectedAttacker, selectedDefender;
 let attackerStats, defenderStats;
-
+let defenderCount = 0;
     
     //Game Function
     
@@ -55,8 +55,9 @@ let attackerStats, defenderStats;
     }
     
     //Select Attacker
-    function selectAttacker() {
+function selectAttacker() {
         $('.character').on('click', function() {
+            if(hasDefender) return;
             if (!hasAttacker) {
                 selectedAttacker = $(this);
                 hasAttacker = true;
@@ -68,18 +69,19 @@ let attackerStats, defenderStats;
                 let bar = $('#attackHpBar');
                 stats(selectedAttacker, name, hp, bar, pwr);
                 attackerStats = charStats(selectedAttacker)
+                pwrUp =attackerStats.atk;
             } else {
+                attackReady = true;
                 selectedDefender = $(this);
                 hasDefender = true;
                 $('#defendArea').replaceWith(selectedDefender);
                 _message.text('Click Attack! Button');
-                attackReady = true;
                 let name = $('#defender');
                 let hp = $('#defendHp');
                 let pwr = $('#counterPwr')
                 let bar = $('#defendHpBar');
                 stats(selectedDefender, name, hp, bar, pwr);
-                defenderStats = charStats(selectedDefender)
+                defenderStats = charStats(selectedDefender);
             }
         })
     }
@@ -87,7 +89,6 @@ let attackerStats, defenderStats;
     function charStats(char) {
         for (let i = 0; i < character.length; i++) {
             if (char.attr('id') === character[i].name){
-                console.log(character[i])
                 return character[i];
             }
         }
@@ -112,12 +113,18 @@ let attackerStats, defenderStats;
             defenderStats.hp = defenderStats.hp - attackerStats.atk;
             attackReady = false;
             statsUpdate(defenderStats.hp)
+            logic(defenderStats.hp)
             setTimeout(function(){
-               attackerStats.hp = attackerStats.hp - defenderStats.catk;
-               attackerStats.atk = attackerStats.atk * 2;
-               statsUpate2 (attackerStats.hp, attackerStats.atk)
-               attackReady = true;
-            }, 1000)
+                if (defenderStats.hp <= 0) return;
+                attackerStats.hp = attackerStats.hp - defenderStats.catk;
+                attackerStats.atk = attackerStats.atk + pwrUp;
+                statsUpate2 (attackerStats.hp, attackerStats.atk)
+                attackReady = true;
+                if (attackerStats.hp <= 0) {
+                    attackReady = false;
+                    return _message.text("Game Over")
+                }
+            }, 700)
         }
     }
 
@@ -131,20 +138,70 @@ let attackerStats, defenderStats;
         $('#attackHpBar').attr("style", "width: " + Math.floor((attackHealth / 150) * 100 )+ "%")
         $('#attackPwr').text(pwrUp);
     }
+
+    //Game Logic
+
+    function logic(defenderHp) {
+        if (defenderHp <= 0) {
+            _message.text("You defeated " + defenderStats.name.toUpperCase()) 
+            defenderCount++;
+            console.log(defenderCount)
+            if (defenderCount < 3) {
+            setTimeout(function() {
+                _message.text("Select the next defender");
+                $('#defend').replaceWith(_defend.clone());
+                attackReady = false;
+                hasDefender = false;
+                selectAttacker();
+            }, 1000)
+         } else { 
+            _message.text("You defeated all defenders!!"); 
+        }
+    }
+    }
     
     //Game Reset
     function reset() {
         hasAttacker = false;
         hasDefender = false;
         attackReady = false;
+        defenderCount = 0;
         _attackHp.empty();
         _attackPwr.empty();
         _defendHp.empty();
         _counterPwr.empty();
+        $('.progress').children().attr("style", "width: 0%");
         $('#fightArea').replaceWith(_fightArea.clone())
         $('#characters').replaceWith(_characters.clone())
+        _message.text("Select the attacker")
+        character = [
+            mario = {
+                 name: 'mario',
+                 hp: 120,
+                 atk: 7,
+                 catk: 8,
+            },
+            goomba = {
+                 name: 'goomba',
+                 hp: 100,
+                 atk: 6,
+                 catk: 6,
+            },
+            koopa = {
+                 name: 'koopa',
+                 hp: 110,
+                 atk: 7,
+                 catk: 10,
+            },
+            bowser = {
+                 name: 'bowser',
+                 hp: 130,
+                 atk: 7,
+                 catk: 12,
+            }
+        ]
         }
         
         //Eventlistener
-    _attackBtn.on('click', attack)
+     _attackBtn.on('click', attack)
     $('#startGame').on('click', startGame)
