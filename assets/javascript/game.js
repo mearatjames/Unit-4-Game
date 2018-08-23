@@ -15,27 +15,27 @@ let _defend = $('#defend').clone()
 let character = [
     mario = {
          name: 'mario',
-         hp: 120,
-         atk: 6,
+         hp: 130,
+         atk: 5,
          catk: 11,
     },
     goomba = {
          name: 'goomba',
-         hp: 110,
-         atk: 7,
-         catk: 7,
+         hp: 120,
+         atk: 6,
+         catk: 14,
     },
     koopa = {
          name: 'koopa',
-         hp: 130,
-         atk: 5,
-         catk: 10,
+         hp: 140,
+         atk: 4,
+         catk: 12,
     },
     bowser = {
          name: 'bowser',
          hp: 150,
-         atk: 6,
-         catk: 12,
+         atk: 4,
+         catk: 13,
     }
 ]
 
@@ -122,12 +122,16 @@ function selectAttacker() {
     function attack() { 
         if (attackReady) {
             attackAudio.play();
+            selectedDefender.animate({opacity: 0.5})
             defenderStats.hp = defenderStats.hp - attackerStats.atk;
             attackReady = false;
             statsUpdate(defenderStats.hp)
             logic(defenderStats.hp)
             setTimeout(function(){
                 if (defenderStats.hp <= 0) return;
+                selectedDefender.animate({opacity: 1})
+                selectedAttacker.animate({opacity: 0.5})
+                selectedAttacker.animate({opacity: 1})
                 attackerStats.hp = attackerStats.hp - defenderStats.catk;
                 attackerStats.atk = attackerStats.atk + pwrUp;
                 statsUpate2 (attackerStats.hp, attackerStats.atk)
@@ -163,7 +167,6 @@ function selectAttacker() {
         if (defenderHp <= 0) {
             _message.text("You defeated " + defenderStats.name.toUpperCase()) 
             defenderCount++;
-            console.log(defenderCount)
             if (defenderCount < 3) {
             setTimeout(function() {
                 defeatAudio.play();
@@ -198,27 +201,27 @@ function selectAttacker() {
         character = [
             mario = {
                  name: 'mario',
-                 hp: 120,
-                 atk: 6,
+                 hp: 130,
+                 atk: 5,
                  catk: 11,
             },
             goomba = {
                  name: 'goomba',
-                 hp: 110,
-                 atk: 7,
-                 catk: 7,
+                 hp: 120,
+                 atk: 6,
+                 catk: 14,
             },
             koopa = {
                  name: 'koopa',
-                 hp: 130,
-                 atk: 5,
-                 catk: 10,
+                 hp: 140,
+                 atk: 4,
+                 catk: 12,
             },
             bowser = {
                  name: 'bowser',
                  hp: 150,
-                 atk: 6,
-                 catk: 12,
+                 atk: 4,
+                 catk: 13,
             }
         ]
         }
