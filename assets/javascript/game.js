@@ -16,25 +16,25 @@ let character = [
     mario = {
          name: 'mario',
          hp: 120,
-         atk: 7,
-         catk: 8,
+         atk: 6,
+         catk: 11,
     },
     goomba = {
          name: 'goomba',
-         hp: 100,
-         atk: 6,
-         catk: 6,
+         hp: 110,
+         atk: 7,
+         catk: 7,
     },
     koopa = {
          name: 'koopa',
-         hp: 110,
-         atk: 7,
+         hp: 130,
+         atk: 5,
          catk: 10,
     },
     bowser = {
          name: 'bowser',
-         hp: 130,
-         atk: 7,
+         hp: 150,
+         atk: 6,
          catk: 12,
     }
 ]
@@ -45,20 +45,30 @@ let attackReady = false;
 let selectedAttacker, selectedDefender;
 let attackerStats, defenderStats;
 let defenderCount = 0;
+let audio = document.getElementById('backgroundAudio')
+let selectAudio = document.getElementById('selectAudio')   
+let selectAudio2 = document.getElementById('selectAudio2')   
+let attackAudio = document.getElementById('attackAudio')   
+let defeatAudio = document.getElementById('defeatAudio')   
+let overAudio = document.getElementById('overAudio')   
+let winAudio = document.getElementById('winAudio')   
     
-    //Game Function
-    
+//Game Function 
     function startGame() {
         reset();
         _message.text('Select the attacker');
         selectAttacker();
+        audio.loop = true;
+        audio.play();
     }
     
     //Select Attacker
 function selectAttacker() {
         $('.character').on('click', function() {
+            audio.pause();
             if(hasDefender) return;
             if (!hasAttacker) {
+                selectAudio.play();
                 selectedAttacker = $(this);
                 hasAttacker = true;
                 _message.text('Select the defender');
@@ -71,6 +81,7 @@ function selectAttacker() {
                 attackerStats = charStats(selectedAttacker)
                 pwrUp =attackerStats.atk;
             } else {
+                selectAudio2.play();
                 attackReady = true;
                 selectedDefender = $(this);
                 hasDefender = true;
@@ -110,6 +121,7 @@ function selectAttacker() {
     //Attack Function
     function attack() { 
         if (attackReady) {
+            attackAudio.play();
             defenderStats.hp = defenderStats.hp - attackerStats.atk;
             attackReady = false;
             statsUpdate(defenderStats.hp)
@@ -122,6 +134,7 @@ function selectAttacker() {
                 attackReady = true;
                 if (attackerStats.hp <= 0) {
                     attackReady = false;
+                    overAudio.play();
                     return _message.text("Game Over")
                 }
             }, 700)
@@ -129,18 +142,23 @@ function selectAttacker() {
     }
 
     function statsUpdate(defendHealth) {
+        if (defendHealth < 0) {
+            defendHealth = 0
+        }
         $('#defendHp').text(defendHealth);
         $('#defendHpBar').attr("style", "width: " + Math.floor((defendHealth / 150) * 100 )+ "%")
     }
 
     function statsUpate2(attackHealth, pwrUp) {
+        if (attackHealth < 0) {
+            attackHealth = 0
+        }
         $('#attackHp').text(attackHealth);
         $('#attackHpBar').attr("style", "width: " + Math.floor((attackHealth / 150) * 100 )+ "%")
         $('#attackPwr').text(pwrUp);
     }
 
     //Game Logic
-
     function logic(defenderHp) {
         if (defenderHp <= 0) {
             _message.text("You defeated " + defenderStats.name.toUpperCase()) 
@@ -148,6 +166,7 @@ function selectAttacker() {
             console.log(defenderCount)
             if (defenderCount < 3) {
             setTimeout(function() {
+                defeatAudio.play();
                 _message.text("Select the next defender");
                 $('#defend').replaceWith(_defend.clone());
                 attackReady = false;
@@ -155,7 +174,9 @@ function selectAttacker() {
                 selectAttacker();
             }, 1000)
          } else { 
-            _message.text("You defeated all defenders!!"); 
+            winAudio.play();
+            _message.text("You defeated all defenders!!");
+
         }
     }
     }
@@ -178,25 +199,25 @@ function selectAttacker() {
             mario = {
                  name: 'mario',
                  hp: 120,
-                 atk: 7,
-                 catk: 8,
+                 atk: 6,
+                 catk: 11,
             },
             goomba = {
                  name: 'goomba',
-                 hp: 100,
-                 atk: 6,
-                 catk: 6,
+                 hp: 110,
+                 atk: 7,
+                 catk: 7,
             },
             koopa = {
                  name: 'koopa',
-                 hp: 110,
-                 atk: 7,
+                 hp: 130,
+                 atk: 5,
                  catk: 10,
             },
             bowser = {
                  name: 'bowser',
-                 hp: 130,
-                 atk: 7,
+                 hp: 150,
+                 atk: 6,
                  catk: 12,
             }
         ]
